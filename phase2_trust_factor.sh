@@ -11,11 +11,11 @@ ros2 launch robot_localization ekf.launch.py &
 
 # 2. Trust Factor Node (Placeholder)
 echo "Starting Trust Factor Node..."
-# ros2 run emrmf_core trust_factor_node &
+ros2 run emrmf_core trust_factor_node &
 
 # 3. LoRa Communication Node (Placeholder)
 echo "Starting LoRa Communication Node..."
-# ros2 run emrmf_comms lora_transmitter_node --ros-args -p port:=/dev/ttyUSB0 -p baudrate:=115200 &
+ros2 run emrmf_comms lora_transmitter_node --ros-args -p port:=/dev/ttyUSB0 -p baudrate:=115200 &
 
 echo "Phase 2 started successfully. Press Ctrl+C to terminate all processes."
 
