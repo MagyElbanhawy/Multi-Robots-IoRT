@@ -2,11 +2,10 @@ import rclpy
 from rclpy.node import Node
 import random
 import time
-from std_msgs.msg import String, Bool
+from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
-from rclpy.serialization import serialize_message, deserialize_message
 
 # Mapping of string types to ROS 2 message types
 MESSAGE_TYPES = {

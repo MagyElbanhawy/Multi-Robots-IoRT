@@ -10,7 +10,7 @@ def compute_ci(data, confidence=0.95):
     n = len(data)
     if n < 2:
         return 0.0
-    m, se = np.mean(data), stats.sem(data)
+    _, se = np.mean(data), stats.sem(data)
     h = se * stats.t.ppf((1 + confidence) / 2., n-1)
     return h
 
