@@ -99,6 +99,25 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
     with open(tex_file, 'w') as f:
         f.write("\n".join(latex_lines))
 
+    # Extract subsets for specific sensitivity analysis tables
+
+    if len(summary_df) > 0:
+        # Trust exponent sensitivity (p = 2, 3, 4; gamma = 0.1)
+        p_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['gamma'] == 0.1)
+        if not summary_df[p_mask].empty:
+            p_sensitivity_df = summary_df[p_mask].sort_values(by='p')
+            p_csv = os.path.join(output_dir, 'trust_exponent_sensitivity.csv')
+            p_sensitivity_df.to_csv(p_csv, index=False)
+            print(f" - {p_csv}")
+
+        # Gamma sensitivity (gamma = 0.1, 0.3, 0.5, 1.0; p = 2.0)
+        g_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['p'] == 2.0)
+        if not summary_df[g_mask].empty:
+            g_sensitivity_df = summary_df[g_mask].sort_values(by='gamma')
+            g_csv = os.path.join(output_dir, 'gamma_sensitivity.csv')
+            g_sensitivity_df.to_csv(g_csv, index=False)
+            print(f" - {g_csv}")
+
     print(f"Reports generated in {output_dir}:")
     print(f" - {summary_csv}")
     print(f" - {md_file}")
