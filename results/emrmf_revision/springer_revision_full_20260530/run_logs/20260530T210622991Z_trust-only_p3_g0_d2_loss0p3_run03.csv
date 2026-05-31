@@ -1,0 +1,2 @@
+session_id,run_log_file,run_started_at_utc,run_completed_at_utc,configuration_id,run_id,ablation_mode,p,gamma,delay_s,packet_loss_rate,pose_rmse_m,map_alignment_rmse_m,fusion_time_s,theta_mean,theta_std
+springer_revision_full_20260530,run_logs/20260530T210622991Z_trust-only_p3_g0_d2_loss0p3_run03.csv,2026-05-30T21:06:22.991Z,2026-05-30T21:06:22.991Z,trust-only_p3_g0_d2_loss0p3,3,trust_only,3.000000,0.000000,2.000000,0.300000,0.700948,0.553154,1.793408,0.802707,0.059314

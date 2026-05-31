@@ -1,0 +1,2 @@
+session_id,run_log_file,run_started_at_utc,run_completed_at_utc,configuration_id,run_id,ablation_mode,p,gamma,delay_s,packet_loss_rate,pose_rmse_m,map_alignment_rmse_m,fusion_time_s,theta_mean,theta_std
+springer_revision_full_20260530,run_logs/20260530T210622609Z_baseline-graph-slam_p1_g0_d0p5_loss0p1_run04.csv,2026-05-30T21:06:22.609Z,2026-05-30T21:06:22.609Z,baseline-graph-slam_p1_g0_d0p5_loss0p1,4,baseline_graph_slam,1.000000,0.000000,0.500000,0.100000,0.614176,0.430224,1.145747,0.657991,0.053153
