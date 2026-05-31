@@ -147,6 +147,22 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
             a_summary_df.to_csv(a_csv, index=False)
             print(f" - {a_csv}")
 
+        # Communication Robustness Summary (delay, packet loss, RMSE, map RMSE, trust value)
+        c_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['noise'] == 0.0) & (summary_df['p'] == 2.0) & (summary_df['gamma'] == 0.1)
+        if not summary_df[c_mask].empty:
+            comm_cols = [
+                'delay', 'packet_loss',
+                'pose_rmse_mean', 'pose_rmse_std', 'pose_rmse_ci95',
+                'map_alignment_rmse_mean', 'map_alignment_rmse_std', 'map_alignment_rmse_ci95',
+                'theta_mean_mean', 'theta_mean_std', 'theta_mean_ci95'
+            ]
+            c_summary_df = summary_df.loc[c_mask, comm_cols]
+            c_summary_df = c_summary_df.sort_values(by=['delay', 'packet_loss'])
+
+            c_csv = os.path.join(output_dir, 'communication_robustness.csv')
+            c_summary_df.to_csv(c_csv, index=False)
+            print(f" - {c_csv}")
+
     print(f"Reports generated in {output_dir}:")
     print(f" - {summary_csv}")
     print(f" - {md_file}")
