@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Outer walls -->
+    <model name="wall_1">
+      <pose>0 10 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>20 0.5 2</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>20 0.5 2</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="wall_2">
+      <pose>0 -10 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>20 0.5 2</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>20 0.5 2</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="wall_3">
+      <pose>10 0 1 0 0 1.5707</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>20 0.5 2</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>20 0.5 2</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="wall_4">
+      <pose>-10 0 1 0 0 1.5707</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>20 0.5 2</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>20 0.5 2</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Inner Obstacles -->
+    <model name="obstacle_1">
+      <pose>2 2 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>1 1 2</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1 1 2</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="obstacle_2">
+      <pose>-3 -3 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>2 1 2</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>2 1 2</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="obstacle_3">
+      <pose>-4 4 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><cylinder><radius>0.5</radius><length>2</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.5</radius><length>2</length></cylinder></geometry></visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

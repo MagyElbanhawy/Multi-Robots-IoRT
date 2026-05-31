@@ -1,0 +1,196 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="emrmf_indoor_world">
+
+    <!-- Lighting -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Ground -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Outer Walls (15m x 10m) -->
+    <!-- North Wall -->
+    <model name="outer_wall_n">
+      <pose>0 5 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>15 0.2 2</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>15 0.2 2</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- South Wall -->
+    <model name="outer_wall_s">
+      <pose>0 -5 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>15 0.2 2</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>15 0.2 2</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- East Wall -->
+    <model name="outer_wall_e">
+      <pose>7.5 0 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 10 2</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.2 10 2</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- West Wall -->
+    <model name="outer_wall_w">
+      <pose>-7.5 0 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 10 2</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>0.2 10 2</size></box></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Inner Layout: Central Corridor and 4 Rooms -->
+    <!-- Corridor Upper Wall -->
+    <model name="corridor_wall_n">
+      <pose>0 1 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>10 0.2 2</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>10 0.2 2</size></box></geometry>
+          <material><ambient>0.5 0.7 0.9 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Corridor Lower Wall -->
+    <model name="corridor_wall_s">
+      <pose>0 -1 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>10 0.2 2</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>10 0.2 2</size></box></geometry>
+          <material><ambient>0.5 0.7 0.9 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Dividing wall between Room 1 (NW) and Room 2 (NE) -->
+    <model name="div_wall_1_2">
+      <pose>0 3 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 4 2</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 4 2</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Dividing wall between Room 3 (SW) and Room 4 (SE) -->
+    <model name="div_wall_3_4">
+      <pose>0 -3 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 4 2</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 4 2</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Doorways (Openings) -->
+    <!-- Doorway Room 1 -->
+    <model name="door_r1">
+      <pose>-3 1 1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <!-- We use an invisible box to represent the gap, so no collision -->
+      </link>
+    </model>
+
+    <!-- Objects / Furniture for SLAM Features -->
+    <!-- Room 1 (NW) -->
+    <model name="box_r1">
+      <pose>-4 3 0.5 0 0 0.5</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1 1 1</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <material><ambient>0.8 0.2 0.2 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Room 2 (NE) -->
+    <model name="cylinder_r2">
+      <pose>4 3 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><cylinder><radius>0.4</radius><length>1</length></cylinder></geometry></collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.4</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0.2 0.8 0.2 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Room 3 (SW) -->
+    <model name="box_r3">
+      <pose>-5 -3 0.5 0 0 -0.2</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1 2 1</size></box></geometry></collision>
+        <visual name="vis">
+          <geometry><box><size>1 2 1</size></box></geometry>
+          <material><ambient>0.2 0.2 0.8 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Room 4 (SE) -->
+    <model name="cylinder_r4">
+      <pose>3 -4 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><cylinder><radius>0.6</radius><length>1</length></cylinder></geometry></collision>
+        <visual name="vis">
+          <geometry><cylinder><radius>0.6</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0.8 0.8 0.2 1</ambient></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Corridor Obstacles -->
+    <model name="corridor_box">
+      <pose>5 0 0.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.5 0.5 0.5</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.5 0.5 0.5</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Scene settings -->
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+  </world>
+</sdf>

@@ -27,36 +27,44 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
 
     df = pd.read_csv(input_csv)
 
+    # Determine if this is a scalability run or regular ablation run based on columns
+    if 'robot_count' not in df.columns:
+        df['robot_count'] = 1 # Backwards compatibility with regular runs
+    if 'accepted_constraints' not in df.columns:
+        df['accepted_constraints'] = 0
+    if 'success_rate' not in df.columns:
+        df['success_rate'] = 0.0
+
     # Group by configuration
-    group_cols = ['ablation_mode', 'p', 'gamma', 'delay', 'packet_loss', 'noise']
+    group_cols = ['ablation_mode', 'p', 'gamma', 'delay', 'packet_loss', 'noise', 'robot_count']
     grouped = df.groupby(group_cols)
 
-    metrics = ['pose_rmse', 'map_alignment_rmse', 'fusion_time', 'theta_mean', 'theta_std']
+    metrics = ['pose_rmse', 'map_alignment_rmse', 'fusion_time', 'theta_mean', 'theta_std', 'accepted_constraints', 'success_rate']
 
     summary_data = []
-    markdown_lines = ["| Mode | p | gamma | Delay | Loss | Noise | Pose RMSE | Map RMSE | Fusion Time (s) | Theta Mean | Runs |",
-                      "|---|---|---|---|---|---|---|---|---|---|---|"]
+    markdown_lines = ["| Mode | Robots | p | gamma | Delay | Loss | Noise | Pose RMSE | Map RMSE | Fusion Time (s) | Theta Mean | Runs |",
+                      "|---|---|---|---|---|---|---|---|---|---|---|---|"]
 
     latex_lines = [
         "\\begin{table}[h]",
         "\\centering",
         "\\caption{EMRMF Experimental Results}",
-        "\\begin{tabular}{l c c c c c c c c c}",
+        "\\begin{tabular}{l c c c c c c c c c c}",
         "\\hline",
-        "Mode & $p$ & $\\gamma$ & Delay (s) & Loss & Noise (m) & Pose RMSE & Map RMSE & Fusion Time (s) & $\\bar{\\theta}$ \\\\",
+        "Mode & Robots & $p$ & $\\gamma$ & Delay (s) & Loss & Noise (m) & Pose RMSE & Map RMSE & Fusion Time (s) & $\\bar{\\theta}$ \\\\",
         "\\hline"
     ]
 
     for name, group in grouped:
-        mode, p, gamma, delay, loss, noise = name
+        mode, p, gamma, delay, loss, noise, r_count = name
         n_runs = len(group)
 
         row_dict = {
-            'ablation_mode': mode, 'p': p, 'gamma': gamma, 'delay': delay, 'packet_loss': loss, 'noise': noise, 'runs': n_runs
+            'ablation_mode': mode, 'p': p, 'gamma': gamma, 'delay': delay, 'packet_loss': loss, 'noise': noise, 'robot_count': r_count, 'runs': n_runs
         }
 
-        md_row = [str(mode), str(p), str(gamma), str(delay), f"{loss*100:.0f}%", str(noise)]
-        tex_row = [str(mode).replace("_", "\\_"), str(p), str(gamma), str(delay), f"{loss*100:.0f}\\%", str(noise)]
+        md_row = [str(mode), str(r_count), str(p), str(gamma), str(delay), f"{loss*100:.0f}%", str(noise)]
+        tex_row = [str(mode).replace("_", "\\_"), str(r_count), str(p), str(gamma), str(delay), f"{loss*100:.0f}\\%", str(noise)]
 
         for metric in metrics:
             data = group[metric].dropna().values
@@ -162,6 +170,39 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
             c_csv = os.path.join(output_dir, 'communication_robustness.csv')
             c_summary_df.to_csv(c_csv, index=False)
             print(f" - {c_csv}")
+
+        # Scalability Summary
+        s_mask = (summary_df['robot_count'] > 1)
+        if not summary_df[s_mask].empty:
+            scale_cols = [
+                'robot_count',
+                'pose_rmse_mean', 'pose_rmse_std', 'pose_rmse_ci95',
+                'map_alignment_rmse_mean',
+                'fusion_time_mean',
+                'theta_mean_mean',
+                'accepted_constraints_mean',
+                'success_rate_mean'
+            ]
+            s_summary_df = summary_df.loc[s_mask, scale_cols]
+            s_summary_df = s_summary_df.sort_values(by=['robot_count'])
+
+            # rename specific column names strictly to user requirements for output
+            s_summary_df = s_summary_df.rename(columns={
+                'pose_rmse_mean': 'mean_pose_rmse',
+                'pose_rmse_std': 'std',
+                'pose_rmse_ci95': 'ci95',
+                'map_alignment_rmse_mean': 'alignment_rmse',
+                'fusion_time_mean': 'fusion_time_ms', # Converting from s to ms below
+                'theta_mean_mean': 'mean_theta',
+                'accepted_constraints_mean': 'accepted_constraints',
+                'success_rate_mean': 'success_rate'
+            })
+
+            s_summary_df['fusion_time_ms'] = s_summary_df['fusion_time_ms'] * 1000.0
+
+            s_csv = os.path.join(output_dir, 'scalability_robot_count_summary.csv')
+            s_summary_df.to_csv(s_csv, index=False)
+            print(f" - {s_csv}")
 
     print(f"Reports generated in {output_dir}:")
     print(f" - {summary_csv}")
