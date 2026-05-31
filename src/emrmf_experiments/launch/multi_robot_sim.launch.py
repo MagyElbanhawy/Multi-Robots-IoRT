@@ -18,7 +18,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py'),
         ),
-        launch_arguments={'world': os.path.join(pkg_emrmf_experiments, 'worlds', 'indoor_map.world')}.items()
+        launch_arguments={'world': os.path.join(pkg_emrmf_experiments, 'worlds', 'emrmf_indoor.world')}.items()
     )
 
     def spawn_robots(context, *args, **kwargs):
