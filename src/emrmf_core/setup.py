@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             'trust_factor_node = emrmf_core.trust_factor_node:main',
             'global_map_fusion_node = emrmf_core.global_map_fusion_node:main',
-            'dynamic_task_allocation_node = emrmf_core.dynamic_task_allocation_node:main'
+            'dynamic_task_allocation_node = emrmf_core.dynamic_task_allocation_node:main',
+            'experiment_logger = emrmf_core.experiment_logger:main'
         ],
     },
 )

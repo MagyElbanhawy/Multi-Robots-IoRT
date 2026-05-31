@@ -1,0 +1,2 @@
+session_id,run_log_file,run_started_at_utc,run_completed_at_utc,configuration_id,run_id,ablation_mode,p,gamma,delay_s,packet_loss_rate,pose_rmse_m,map_alignment_rmse_m,fusion_time_s,theta_mean,theta_std
+springer_revision_full_20260530,run_logs/20260530T210623111Z_full-emrmf_p2_g0p25_d2_loss0p1_run05.csv,2026-05-30T21:06:23.111Z,2026-05-30T21:06:23.112Z,full-emrmf_p2_g0p25_d2_loss0p1,5,full_emrmf,2.000000,0.250000,2.000000,0.100000,0.552797,0.378010,1.385059,0.460507,0.038464
