@@ -126,6 +126,27 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
             r_comparison_df.to_csv(r_csv, index=False)
             print(f" - {r_csv}")
 
+        # Ablation Study Summary (baseline vs decentralized vs trust vs full)
+        a_mask = (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['noise'] == 0.0) & (summary_df['p'] == 2.0) & (summary_df['gamma'] == 0.1)
+        if not summary_df[a_mask].empty:
+            # We want to extract specific columns explicitly for the final table
+            ablation_cols = [
+                'ablation_mode',
+                'pose_rmse_mean', 'pose_rmse_std', 'pose_rmse_ci95',
+                'map_alignment_rmse_mean', 'map_alignment_rmse_std', 'map_alignment_rmse_ci95',
+                'fusion_time_mean', 'fusion_time_std', 'fusion_time_ci95'
+            ]
+            a_summary_df = summary_df.loc[a_mask, ablation_cols]
+
+            # Ensure proper ordering of rows
+            mode_order = ['baseline_graph_slam', 'decentralized_only', 'trust_only', 'full_emrmf']
+            a_summary_df['ablation_mode'] = pd.Categorical(a_summary_df['ablation_mode'], categories=mode_order, ordered=True)
+            a_summary_df = a_summary_df.sort_values('ablation_mode')
+
+            a_csv = os.path.join(output_dir, 'ablation_study_summary.csv')
+            a_summary_df.to_csv(a_csv, index=False)
+            print(f" - {a_csv}")
+
     print(f"Reports generated in {output_dir}:")
     print(f" - {summary_csv}")
     print(f" - {md_file}")
