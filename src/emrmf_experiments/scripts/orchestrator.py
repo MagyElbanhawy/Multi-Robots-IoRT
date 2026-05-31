@@ -10,6 +10,7 @@ p_values = [2, 3, 4]
 gamma_values = [0.1, 0.3, 0.5, 1.0]
 delay_values = [0.0, 0.5, 2.0]
 packet_loss_values = [0.0, 0.10, 0.30]
+noise_values = [0.0, 0.05, 0.10]
 ablation_modes = ["baseline_graph_slam", "decentralized_only", "trust_only", "full_emrmf"]
 runs_per_config = 5
 
@@ -26,22 +27,35 @@ def main():
 
     configs_to_run = []
 
-    # 1. Ablation Study (No delay, no loss, fixed p=2, gamma=0.1)
+    # 1. Ablation Study (No delay, no loss, no noise, fixed p=2, gamma=0.1)
     for mode in ablation_modes:
-        configs_to_run.append((mode, 2.0, 0.1, 0.0, 0.0))
+        configs_to_run.append((mode, 2.0, 0.1, 0.0, 0.0, 0.0))
 
-    # 2. Trust Factor Sensitivity (full_emrmf, no delay/loss)
+    # 2. Trust Factor Sensitivity (full_emrmf, no delay/loss/noise)
     for p in p_values:
         for gamma in gamma_values:
-            if (p != 2.0 or gamma != 0.1): # Avoid duplicate with ablation
-                configs_to_run.append(("full_emrmf", float(p), float(gamma), 0.0, 0.0))
+            if p != 2.0 or gamma != 0.1: # Avoid duplicate with ablation
+                configs_to_run.append(("full_emrmf", float(p), float(gamma), 0.0, 0.0, 0.0))
 
     # 3. Communication Robustness (full_emrmf and baseline, fixed p=2, gamma=0.1, varying delay/loss)
+    # Keeping this for legacy compatibility, ensuring noise is 0.0
     for mode in ["baseline_graph_slam", "full_emrmf"]:
         for d in delay_values:
-            for l in packet_loss_values:
-                if d != 0.0 or l != 0.0:
-                    configs_to_run.append((mode, 2.0, 0.1, float(d), float(l)))
+            for pkt_loss in packet_loss_values:
+                if d != 0.0 or pkt_loss != 0.0:
+                    configs_to_run.append((mode, 2.0, 0.1, float(d), float(pkt_loss), 0.0))
+
+    # 4. Exponent Robustness Comparison (full_emrmf, fixed gamma=0.1, varying p under degradations)
+    for p in p_values:
+        # Isolated Delay
+        for d in [0.5, 2.0]:
+            configs_to_run.append(("full_emrmf", float(p), 0.1, float(d), 0.0, 0.0))
+        # Isolated Packet Loss
+        for pkt_loss in [0.10, 0.30]:
+            configs_to_run.append(("full_emrmf", float(p), 0.1, 0.0, float(pkt_loss), 0.0))
+        # Isolated Noise
+        for noise in [0.05, 0.10]:
+            configs_to_run.append(("full_emrmf", float(p), 0.1, 0.0, 0.0, float(noise)))
 
     total_runs = len(configs_to_run) * runs_per_config
     current_run = 0
@@ -49,11 +63,11 @@ def main():
     print(f"Total configurations: {len(configs_to_run)}")
     print(f"Total runs (x{runs_per_config}): {total_runs}")
 
-    for config in configs_to_run:
-        mode, p, gamma, delay, loss = config
+    for config in set(configs_to_run): # Remove duplicates if any
+        mode, p, gamma, delay, pkt_loss, noise = config
         for i in range(runs_per_config):
             current_run += 1
-            run_id = f"{mode}_p{p}_g{gamma}_d{delay}_l{loss}_run{i}"
+            run_id = f"{mode}_p{p}_g{gamma}_d{delay}_l{pkt_loss}_n{noise}_run{i}"
 
             print(f"[{current_run}/{total_runs}] Starting: {run_id}")
 
@@ -64,7 +78,8 @@ def main():
                 f"p:={p}",
                 f"gamma:={gamma}",
                 f"delay_sec:={delay}",
-                f"packet_loss_rate:={loss}",
+                f"packet_loss_rate:={pkt_loss}",
+                f"noise_stddev:={noise}",
                 f"run_id:={run_id}",
                 f"output_dir:={output_dir}"
             ]

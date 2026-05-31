@@ -28,35 +28,35 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
     df = pd.read_csv(input_csv)
 
     # Group by configuration
-    group_cols = ['ablation_mode', 'p', 'gamma', 'delay', 'packet_loss']
+    group_cols = ['ablation_mode', 'p', 'gamma', 'delay', 'packet_loss', 'noise']
     grouped = df.groupby(group_cols)
 
     metrics = ['pose_rmse', 'map_alignment_rmse', 'fusion_time', 'theta_mean', 'theta_std']
 
     summary_data = []
-    markdown_lines = ["| Mode | p | gamma | Delay | Loss | Pose RMSE | Map RMSE | Fusion Time (s) | Theta Mean | Runs |",
-                      "|---|---|---|---|---|---|---|---|---|---|"]
+    markdown_lines = ["| Mode | p | gamma | Delay | Loss | Noise | Pose RMSE | Map RMSE | Fusion Time (s) | Theta Mean | Runs |",
+                      "|---|---|---|---|---|---|---|---|---|---|---|"]
 
     latex_lines = [
         "\\begin{table}[h]",
         "\\centering",
         "\\caption{EMRMF Experimental Results}",
-        "\\begin{tabular}{l c c c c c c c c}",
+        "\\begin{tabular}{l c c c c c c c c c}",
         "\\hline",
-        "Mode & $p$ & $\\gamma$ & Delay (s) & Loss & Pose RMSE & Map RMSE & Fusion Time (s) & $\\bar{\\theta}$ \\\\",
+        "Mode & $p$ & $\\gamma$ & Delay (s) & Loss & Noise (m) & Pose RMSE & Map RMSE & Fusion Time (s) & $\\bar{\\theta}$ \\\\",
         "\\hline"
     ]
 
     for name, group in grouped:
-        mode, p, gamma, delay, loss = name
+        mode, p, gamma, delay, loss, noise = name
         n_runs = len(group)
 
         row_dict = {
-            'ablation_mode': mode, 'p': p, 'gamma': gamma, 'delay': delay, 'packet_loss': loss, 'runs': n_runs
+            'ablation_mode': mode, 'p': p, 'gamma': gamma, 'delay': delay, 'packet_loss': loss, 'noise': noise, 'runs': n_runs
         }
 
-        md_row = [str(mode), str(p), str(gamma), str(delay), f"{loss*100:.0f}%"]
-        tex_row = [str(mode).replace("_", "\\_"), str(p), str(gamma), str(delay), f"{loss*100:.0f}\\%"]
+        md_row = [str(mode), str(p), str(gamma), str(delay), f"{loss*100:.0f}%", str(noise)]
+        tex_row = [str(mode).replace("_", "\\_"), str(p), str(gamma), str(delay), f"{loss*100:.0f}\\%", str(noise)]
 
         for metric in metrics:
             data = group[metric].dropna().values
@@ -103,7 +103,7 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
 
     if len(summary_df) > 0:
         # Trust exponent sensitivity (p = 2, 3, 4; gamma = 0.1)
-        p_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['gamma'] == 0.1)
+        p_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['noise'] == 0.0) & (summary_df['gamma'] == 0.1)
         if not summary_df[p_mask].empty:
             p_sensitivity_df = summary_df[p_mask].sort_values(by='p')
             p_csv = os.path.join(output_dir, 'trust_exponent_sensitivity.csv')
@@ -111,12 +111,20 @@ def generate_reports(input_csv='/tmp/emrmf_experiments/raw_results.csv', output_
             print(f" - {p_csv}")
 
         # Gamma sensitivity (gamma = 0.1, 0.3, 0.5, 1.0; p = 2.0)
-        g_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['p'] == 2.0)
+        g_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['delay'] == 0.0) & (summary_df['packet_loss'] == 0.0) & (summary_df['noise'] == 0.0) & (summary_df['p'] == 2.0)
         if not summary_df[g_mask].empty:
             g_sensitivity_df = summary_df[g_mask].sort_values(by='gamma')
             g_csv = os.path.join(output_dir, 'gamma_sensitivity.csv')
             g_sensitivity_df.to_csv(g_csv, index=False)
             print(f" - {g_csv}")
+
+        # Robustness Comparison (p = 2, 3, 4 under delay, loss, noise)
+        r_mask = (summary_df['ablation_mode'] == 'full_emrmf') & (summary_df['gamma'] == 0.1) & ((summary_df['delay'] > 0.0) | (summary_df['packet_loss'] > 0.0) | (summary_df['noise'] > 0.0))
+        if not summary_df[r_mask].empty:
+            r_comparison_df = summary_df[r_mask].sort_values(by=['delay', 'packet_loss', 'noise', 'p'])
+            r_csv = os.path.join(output_dir, 'robustness_comparison.csv')
+            r_comparison_df.to_csv(r_csv, index=False)
+            print(f" - {r_csv}")
 
     print(f"Reports generated in {output_dir}:")
     print(f" - {summary_csv}")

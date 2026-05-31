@@ -2,6 +2,7 @@ network_proxy_node:
   ros__parameters:
     delay_sec: 0.0
     packet_loss_rate: 0.0
+    noise_stddev: 0.0
     proxy_configs:
       - "/robot1/local_map,/proxy/robot1/local_map,sensor_msgs/msg/PointCloud2"
       - "/robot2/local_map,/proxy/robot2/local_map,sensor_msgs/msg/PointCloud2"

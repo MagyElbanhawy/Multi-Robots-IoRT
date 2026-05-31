@@ -24,6 +24,7 @@ class ExperimentLoggerNode(Node):
         self.declare_parameter('ablation_mode', 'full_emrmf')
         self.declare_parameter('delay_sec', 0.0)
         self.declare_parameter('packet_loss_rate', 0.0)
+        self.declare_parameter('noise_stddev', 0.0)
         self.declare_parameter('output_dir', '/tmp/emrmf_experiments')
         self.declare_parameter('run_id', 'run_0')
 
@@ -40,6 +41,7 @@ class ExperimentLoggerNode(Node):
         self.ablation_mode = self.get_parameter('ablation_mode').value
         self.delay_sec = self.get_parameter('delay_sec').value
         self.packet_loss_rate = self.get_parameter('packet_loss_rate').value
+        self.noise_stddev = self.get_parameter('noise_stddev').value
         self.output_dir = self.get_parameter('output_dir').value
         self.run_id = self.get_parameter('run_id').value
 
@@ -195,10 +197,10 @@ class ExperimentLoggerNode(Node):
         with open(csv_file, 'a', newline='') as f:
             writer = csv.writer(f)
             if write_header:
-                writer.writerow(['run_id', 'ablation_mode', 'p', 'gamma', 'delay', 'packet_loss',
+                writer.writerow(['run_id', 'ablation_mode', 'p', 'gamma', 'delay', 'packet_loss', 'noise',
                                'pose_rmse', 'map_alignment_rmse', 'fusion_time', 'theta_mean', 'theta_std'])
             writer.writerow([
-                self.run_id, self.ablation_mode, self.p, self.gamma, self.delay_sec, self.packet_loss_rate,
+                self.run_id, self.ablation_mode, self.p, self.gamma, self.delay_sec, self.packet_loss_rate, self.noise_stddev,
                 pose_rmse, map_rmse, avg_fusion_time, theta_mean, theta_std
             ])
 

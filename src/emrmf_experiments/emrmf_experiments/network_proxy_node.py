@@ -16,13 +16,14 @@ MESSAGE_TYPES = {
 }
 
 class TopicProxy:
-    def __init__(self, node, input_topic, output_topic, msg_type_str, delay_sec, packet_loss_rate):
+    def __init__(self, node, input_topic, output_topic, msg_type_str, delay_sec, packet_loss_rate, noise_stddev):
         self.node = node
         self.input_topic = input_topic
         self.output_topic = output_topic
         self.msg_type_str = msg_type_str
         self.delay_sec = delay_sec
         self.packet_loss_rate = packet_loss_rate
+        self.noise_stddev = noise_stddev
 
         self.msg_type = MESSAGE_TYPES.get(self.msg_type_str)
         if not self.msg_type:
@@ -44,6 +45,17 @@ class TopicProxy:
         if random.random() < self.packet_loss_rate:
             # Message dropped
             return
+
+        # Apply noise if applicable
+        if self.noise_stddev > 0.0:
+            if isinstance(msg, Odometry):
+                msg.pose.pose.position.x += random.gauss(0, self.noise_stddev)
+                msg.pose.pose.position.y += random.gauss(0, self.noise_stddev)
+                msg.pose.pose.position.z += random.gauss(0, self.noise_stddev)
+            elif isinstance(msg, PoseStamped):
+                msg.pose.position.x += random.gauss(0, self.noise_stddev)
+                msg.pose.position.y += random.gauss(0, self.noise_stddev)
+                msg.pose.position.z += random.gauss(0, self.noise_stddev)
 
         # Add to queue with target publish time
         publish_time = time.time() + self.delay_sec
@@ -73,6 +85,7 @@ class NetworkProxyNode(Node):
         # Declare parameters
         self.declare_parameter('delay_sec', 0.0)
         self.declare_parameter('packet_loss_rate', 0.0)
+        self.declare_parameter('noise_stddev', 0.0)
         self.declare_parameter('topics_to_proxy', [])
 
         # Fallback dictionary of topics to proxy if param is empty or parsing fails
@@ -87,9 +100,10 @@ class NetworkProxyNode(Node):
 
         self.delay_sec = self.get_parameter('delay_sec').value
         self.packet_loss_rate = self.get_parameter('packet_loss_rate').value
+        self.noise_stddev = self.get_parameter('noise_stddev').value
         proxy_configs = self.get_parameter('proxy_configs').value
 
-        self.get_logger().info(f"Initializing Network Proxy: Delay={self.delay_sec}s, Loss={self.packet_loss_rate*100}%")
+        self.get_logger().info(f"Initializing Network Proxy: Delay={self.delay_sec}s, Loss={self.packet_loss_rate*100}%, Noise={self.noise_stddev}m")
 
         self.proxies = []
         for config_str in proxy_configs:
@@ -99,7 +113,7 @@ class NetworkProxyNode(Node):
                 output_topic = parts[1].strip()
                 msg_type = parts[2].strip()
 
-                proxy = TopicProxy(self, input_topic, output_topic, msg_type, self.delay_sec, self.packet_loss_rate)
+                proxy = TopicProxy(self, input_topic, output_topic, msg_type, self.delay_sec, self.packet_loss_rate, self.noise_stddev)
                 self.proxies.append(proxy)
                 self.get_logger().info(f"Proxying: {input_topic} -> {output_topic} ({msg_type})")
             else:

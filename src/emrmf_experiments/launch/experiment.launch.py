@@ -13,6 +13,7 @@ def generate_launch_description():
     mode_arg = DeclareLaunchArgument('ablation_mode', default_value='full_emrmf')
     delay_arg = DeclareLaunchArgument('delay_sec', default_value='0.0')
     loss_arg = DeclareLaunchArgument('packet_loss_rate', default_value='0.0')
+    noise_arg = DeclareLaunchArgument('noise_stddev', default_value='0.0')
     run_id_arg = DeclareLaunchArgument('run_id', default_value='test_run')
     out_dir_arg = DeclareLaunchArgument('output_dir', default_value='/tmp/emrmf_experiments')
 
@@ -25,6 +26,7 @@ def generate_launch_description():
         parameters=[{
             'delay_sec': LaunchConfiguration('delay_sec'),
             'packet_loss_rate': LaunchConfiguration('packet_loss_rate'),
+            'noise_stddev': LaunchConfiguration('noise_stddev'),
             'proxy_configs': [
                 "/robot1/local_map,/proxy/robot1/local_map,sensor_msgs/msg/PointCloud2",
                 "/robot2/local_map,/proxy/robot2/local_map,sensor_msgs/msg/PointCloud2",
@@ -48,6 +50,7 @@ def generate_launch_description():
             'ablation_mode': LaunchConfiguration('ablation_mode'),
             'delay_sec': LaunchConfiguration('delay_sec'),
             'packet_loss_rate': LaunchConfiguration('packet_loss_rate'),
+            'noise_stddev': LaunchConfiguration('noise_stddev'),
             'run_id': LaunchConfiguration('run_id'),
             'output_dir': LaunchConfiguration('output_dir'),
 
@@ -71,7 +74,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        p_arg, gamma_arg, tau_e_arg, mode_arg, delay_arg, loss_arg, run_id_arg, out_dir_arg,
+        p_arg, gamma_arg, tau_e_arg, mode_arg, delay_arg, loss_arg, noise_arg, run_id_arg, out_dir_arg,
         proxy_node,
         logger_node,
         shutdown_on_logger_exit
